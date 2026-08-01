@@ -4,6 +4,39 @@
 
 Windows / macOS に M5Stack を接続したのに `arduino-cli board list` で `Unknown` と出るときや、開発を始める前に正しいボード設定・書き込みフローを CLI だけで整えたいときに使います。
 
+## Claude Code スキルとしての配置
+
+Claude Code は `.claude/skills/` 配下のスキルを読み込みます。このリポジトリをディレクトリ名 `m5stack-arduino-cli` で配置してください。
+
+プロジェクトに clone する場合:
+
+```bash
+git clone https://github.com/Sunwood-ai-labs/m5stack-arduino-cli-skill \
+  .claude/skills/m5stack-arduino-cli
+```
+
+バージョンをプロジェクトに固定したい場合は submodule として追加します:
+
+```bash
+git submodule add https://github.com/Sunwood-ai-labs/m5stack-arduino-cli-skill \
+  .claude/skills/m5stack-arduino-cli
+```
+
+配置後のレイアウト:
+
+```text
+your-project/
+└── .claude/
+    └── skills/
+        └── m5stack-arduino-cli/
+            ├── SKILL.md
+            ├── scripts/
+            ├── references/
+            └── examples/
+```
+
+**パスの解決について:** Claude Code の作業ディレクトリ（cwd）は利用者のプロジェクトルートで、スキルのフォルダではありません。そのため同梱ファイルは cwd からの相対パスでは解決できません。`SKILL.md` では同梱ファイルを `${CLAUDE_SKILL_DIR}/...`（上記のスキル配置先ディレクトリ）として参照し、利用者自身のスケッチや素材はプロジェクト内の通常の相対パスのままにします。`${CLAUDE_SKILL_DIR}` は Claude Code 独自の記法で Codex では展開されないため、Codex でリポジトリを直接使う場合はリポジトリルートと読み替えてください。
+
 ## 推奨プロンプト
 
 Claude Code:

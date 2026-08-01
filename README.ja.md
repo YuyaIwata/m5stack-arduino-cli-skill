@@ -30,6 +30,43 @@
 
 このスキルは単発のトラブルシュートだけでなく、日常的な開発支援も前提にしています。シリアルポート（Windows は `COM*`、macOS は `/dev/cu.*`）の切り分け、ESP32 コア導入、M5 系ライブラリの導入、`board attach`、コンパイル、アップロードまでを CLI ベースで再現可能な流れにまとめています。
 
+## Claude Code スキルとしての配置
+
+Claude Code は `.claude/skills/` 配下のスキルを認識します。このリポジトリをディレクトリ名 `m5stack-arduino-cli` で配置してください。
+
+プロジェクトに clone する場合:
+
+```bash
+git clone https://github.com/Sunwood-ai-labs/m5stack-arduino-cli-skill \
+  .claude/skills/m5stack-arduino-cli
+```
+
+バージョンをプロジェクトに固定したい場合は submodule として追加します:
+
+```bash
+git submodule add https://github.com/Sunwood-ai-labs/m5stack-arduino-cli-skill \
+  .claude/skills/m5stack-arduino-cli
+```
+
+配置後は次のようになります:
+
+```text
+your-project/
+└── .claude/
+    └── skills/
+        └── m5stack-arduino-cli/
+            ├── SKILL.md
+            ├── scripts/
+            ├── references/
+            └── examples/
+```
+
+### パスの解決について
+
+Claude Code の作業ディレクトリ（cwd）は**利用者のプロジェクトルート**であり、スキルのフォルダではありません。そのため同梱ファイルは cwd からの相対パスでは解決できません。`SKILL.md` では同梱ファイルを `${CLAUDE_SKILL_DIR}/...`（例: `${CLAUDE_SKILL_DIR}/scripts/setup-m5core2.sh`）として参照します。`${CLAUDE_SKILL_DIR}` は上記のスキル配置先ディレクトリを指します。利用者自身のファイル（スケッチやアニメーション素材など）は、これまでどおりプロジェクト内の通常の相対パスのままにします。
+
+**このリポジトリを Codex で直接使う場合:** `${CLAUDE_SKILL_DIR}` は Claude Code 独自の記法で、Codex では展開されません。リポジトリ自体を開いて（または clone して）使う場合は、`${CLAUDE_SKILL_DIR}` をリポジトリルートと読み替えてください。
+
 ## このスキルでできること
 
 - `Unknown` の意味を正しく切り分ける

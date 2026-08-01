@@ -25,6 +25,43 @@ This repository packages a reusable skill — usable by both Claude and Codex �
 
 The skill is optimized for practical troubleshooting and day-to-day development. It prioritizes proving device health, finding the correct serial port (`COM*` on Windows, `/dev/cu.*` on macOS), attaching the right board profile, installing common libraries, and getting back to a successful compile or upload without unnecessary driver churn.
 
+## Install As A Claude Code Skill
+
+Claude Code discovers skills under `.claude/skills/`. Place this repository there using the directory name `m5stack-arduino-cli`.
+
+Clone it into your project:
+
+```bash
+git clone https://github.com/Sunwood-ai-labs/m5stack-arduino-cli-skill \
+  .claude/skills/m5stack-arduino-cli
+```
+
+Or add it as a submodule so the version is pinned with your project:
+
+```bash
+git submodule add https://github.com/Sunwood-ai-labs/m5stack-arduino-cli-skill \
+  .claude/skills/m5stack-arduino-cli
+```
+
+The result should look like:
+
+```text
+your-project/
+└── .claude/
+    └── skills/
+        └── m5stack-arduino-cli/
+            ├── SKILL.md
+            ├── scripts/
+            ├── references/
+            └── examples/
+```
+
+### How paths resolve
+
+Claude Code's working directory is **your project root**, not the skill folder, so the bundled files cannot be reached with a path relative to the current directory. `SKILL.md` refers to its own files as `${CLAUDE_SKILL_DIR}/...` (for example `${CLAUDE_SKILL_DIR}/scripts/setup-m5core2.sh`), where `${CLAUDE_SKILL_DIR}` is the skill's install directory above. Your own files — your sketch folder and any animation assets — stay as ordinary paths in your project.
+
+**Using this repository directly with Codex:** `${CLAUDE_SKILL_DIR}` is a Claude Code convention that Codex does not expand. When you have opened or cloned this repository as the repo itself, read `${CLAUDE_SKILL_DIR}` as the repository root.
+
 ## Why This Skill
 
 - Explains why `arduino-cli board list` can show a valid serial port but still report `Unknown`

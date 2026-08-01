@@ -4,6 +4,39 @@
 
 Use this skill when an M5Stack board is connected to Windows or macOS but `arduino-cli board list` still reports the board as `Unknown`, or when you want the agent to set up, attach, and flash the correct board profile before development starts.
 
+## Install As A Claude Code Skill
+
+Claude Code loads skills from `.claude/skills/`. Place this repository there under the directory name `m5stack-arduino-cli`.
+
+Clone it into your project:
+
+```bash
+git clone https://github.com/Sunwood-ai-labs/m5stack-arduino-cli-skill \
+  .claude/skills/m5stack-arduino-cli
+```
+
+Or pin it to your project as a submodule:
+
+```bash
+git submodule add https://github.com/Sunwood-ai-labs/m5stack-arduino-cli-skill \
+  .claude/skills/m5stack-arduino-cli
+```
+
+The layout should be:
+
+```text
+your-project/
+└── .claude/
+    └── skills/
+        └── m5stack-arduino-cli/
+            ├── SKILL.md
+            ├── scripts/
+            ├── references/
+            └── examples/
+```
+
+**How paths resolve:** Claude Code's working directory is your project root, not the skill folder, so bundled files cannot be reached with a path relative to the current directory. `SKILL.md` refers to its own files as `${CLAUDE_SKILL_DIR}/...` (the skill's install directory above), while your own sketch and assets stay as ordinary paths in your project. `${CLAUDE_SKILL_DIR}` is a Claude Code convention that Codex does not expand — when using this repository directly with Codex, read it as the repository root.
+
 ## Recommended Prompt
 
 In Claude Code:

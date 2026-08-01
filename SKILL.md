@@ -7,12 +7,22 @@ description: Set up, diagnose, flash, and support development for M5Stack boards
 
 Use this skill to work with M5Stack boards from Arduino CLI on Windows or macOS, especially when the board appears as `Unknown` in `arduino-cli board list`.
 
+## Path resolution
+
+This skill is normally installed at `.claude/skills/m5stack-arduino-cli/`, and Claude Code's working directory is the user's project root — **not** this skill's directory. So the bundled files cannot be reached with a path relative to the cwd.
+
+- All files shipped with this skill live under `${CLAUDE_SKILL_DIR}` (the skill's install directory).
+- Every reference below to `scripts/`, `references/`, or `examples/` is written as `${CLAUDE_SKILL_DIR}/...` and must be resolved from there, never from the cwd.
+- `${CLAUDE_SKILL_DIR}` is a placeholder for that absolute directory. Substitute the real path before running a command (in bash, `export CLAUDE_SKILL_DIR=...` once and let it expand; in PowerShell, replace it with the real path).
+- The user's own files — their sketch folder, animation input assets, output locations in their project — are **not** part of the skill. Keep those as ordinary paths relative to the user's project, exactly as the user gives them.
+- **Codex note:** `${CLAUDE_SKILL_DIR}` is a Claude Code extension and is **not** expanded by Codex. When this repository is used directly (opened or cloned as the repo itself), read `${CLAUDE_SKILL_DIR}` as the repository root.
+
 ## Detect the platform first
 
 Pick the toolset that matches the user's OS before running commands:
 
-- **Windows** → PowerShell helpers (`scripts/*.ps1`), `COM*` ports, `Get-PnpDevice`. See [references/windows-setup-and-diagnosis.md](./references/windows-setup-and-diagnosis.md).
-- **macOS / Linux** → bash helpers (`scripts/*.sh`), `/dev/cu.*` (macOS) or `/dev/ttyUSB*` (Linux) devices, `system_profiler`. See [references/macos-setup-and-diagnosis.md](./references/macos-setup-and-diagnosis.md).
+- **Windows** → PowerShell helpers (`${CLAUDE_SKILL_DIR}/scripts/*.ps1`), `COM*` ports, `Get-PnpDevice`. See [windows-setup-and-diagnosis.md](${CLAUDE_SKILL_DIR}/references/windows-setup-and-diagnosis.md).
+- **macOS / Linux** → bash helpers (`${CLAUDE_SKILL_DIR}/scripts/*.sh`), `/dev/cu.*` (macOS) or `/dev/ttyUSB*` (Linux) devices, `system_profiler`. See [macos-setup-and-diagnosis.md](${CLAUDE_SKILL_DIR}/references/macos-setup-and-diagnosis.md).
 
 The Arduino CLI subcommands themselves (`core`, `lib`, `board attach`, `compile`, `upload`) are identical across platforms — only binary discovery, port naming, and shell syntax differ.
 
@@ -55,19 +65,19 @@ The Arduino CLI subcommands themselves (`core`, `lib`, `board attach`, `compile`
 
 Windows (PowerShell):
 
-- Use [scripts/setup-m5core2.ps1](./scripts/setup-m5core2.ps1) to locate Arduino CLI, ensure ESP32 support is configured, install common libraries, and optionally attach a sketch to a board/port.
-- Use [scripts/upload-m5core2.ps1](./scripts/upload-m5core2.ps1) to compile and upload a sketch with attached settings or an explicit board and port.
+- Use [setup-m5core2.ps1](${CLAUDE_SKILL_DIR}/scripts/setup-m5core2.ps1) to locate Arduino CLI, ensure ESP32 support is configured, install common libraries, and optionally attach a sketch to a board/port.
+- Use [upload-m5core2.ps1](${CLAUDE_SKILL_DIR}/scripts/upload-m5core2.ps1) to compile and upload a sketch with attached settings or an explicit board and port.
 
 macOS / Linux (bash):
 
-- Use [scripts/setup-m5core2.sh](./scripts/setup-m5core2.sh) for the same setup flow. It auto-detects a likely `/dev/cu.*` port when `--port` is omitted.
-- Use [scripts/upload-m5core2.sh](./scripts/upload-m5core2.sh) to compile and upload. Add `--dry-run` to preview commands.
+- Use [setup-m5core2.sh](${CLAUDE_SKILL_DIR}/scripts/setup-m5core2.sh) for the same setup flow. It auto-detects a likely `/dev/cu.*` port when `--port` is omitted.
+- Use [upload-m5core2.sh](${CLAUDE_SKILL_DIR}/scripts/upload-m5core2.sh) to compile and upload. Add `--dry-run` to preview commands.
 
 Shared:
 
-- Use [examples/m5core2/hello/hello.ino](./examples/m5core2/hello/hello.ino) as the default sample sketch for setup checks and first-flash validation.
-- Use [scripts/generate_sprite_animation.py](./scripts/generate_sprite_animation.py) when a user wants to turn a transparent animated WebP into RGB565 frames and preview artifacts for M5Core2.
-- Add future examples under `examples/<board>/<sample>/`, future board setup flows under `scripts/setup/`, and shared logic under `scripts/common/`.
+- Use [hello.ino](${CLAUDE_SKILL_DIR}/examples/m5core2/hello/hello.ino) as the default sample sketch for setup checks and first-flash validation.
+- Use [generate_sprite_animation.py](${CLAUDE_SKILL_DIR}/scripts/generate_sprite_animation.py) when a user wants to turn a transparent animated WebP into RGB565 frames and preview artifacts for M5Core2.
+- Add future examples under `${CLAUDE_SKILL_DIR}/examples/<board>/<sample>/`, future board setup flows under `${CLAUDE_SKILL_DIR}/scripts/setup/`, and shared logic under `${CLAUDE_SKILL_DIR}/scripts/common/`.
 
 ## Canonical command examples
 
@@ -76,23 +86,23 @@ Shared:
 ```powershell
 $cli = "C:\Users\<User>\AppData\Local\Programs\Arduino IDE\resources\app\lib\backend\resources\arduino-cli.exe"
 
-& $cli board attach -p COM11 -b esp32:esp32:m5stack_core2 .\examples\m5core2\hello
-& $cli compile .\examples\m5core2\hello
-& $cli upload -p COM11 .\examples\m5core2\hello
+& $cli board attach -p COM11 -b esp32:esp32:m5stack_core2 ${CLAUDE_SKILL_DIR}\examples\m5core2\hello
+& $cli compile ${CLAUDE_SKILL_DIR}\examples\m5core2\hello
+& $cli upload -p COM11 ${CLAUDE_SKILL_DIR}\examples\m5core2\hello
 ```
 
 With explicit board selection on each command:
 
 ```powershell
-& $cli compile --fqbn esp32:esp32:m5stack_core2 .\examples\m5core2\hello
-& $cli upload -p COM11 --fqbn esp32:esp32:m5stack_core2 .\examples\m5core2\hello
+& $cli compile --fqbn esp32:esp32:m5stack_core2 ${CLAUDE_SKILL_DIR}\examples\m5core2\hello
+& $cli upload -p COM11 --fqbn esp32:esp32:m5stack_core2 ${CLAUDE_SKILL_DIR}\examples\m5core2\hello
 ```
 
 Helper scripts:
 
 ```powershell
-.\scripts\setup-m5core2.ps1 -SketchPath .\examples\m5core2\hello -Port COM11
-.\scripts\upload-m5core2.ps1 -SketchPath .\examples\m5core2\hello -Port COM11
+& ${CLAUDE_SKILL_DIR}\scripts\setup-m5core2.ps1 -SketchPath ${CLAUDE_SKILL_DIR}\examples\m5core2\hello -Port COM11
+& ${CLAUDE_SKILL_DIR}\scripts\upload-m5core2.ps1 -SketchPath ${CLAUDE_SKILL_DIR}\examples\m5core2\hello -Port COM11
 ```
 
 ### macOS (bash)
@@ -100,26 +110,28 @@ Helper scripts:
 ```bash
 port=/dev/cu.wchusbserial53240012345   # from: arduino-cli board list
 
-arduino-cli board attach -p "$port" -b esp32:esp32:m5stack_core2 ./examples/m5core2/hello
-arduino-cli compile ./examples/m5core2/hello
-arduino-cli upload -p "$port" ./examples/m5core2/hello
+arduino-cli board attach -p "$port" -b esp32:esp32:m5stack_core2 ${CLAUDE_SKILL_DIR}/examples/m5core2/hello
+arduino-cli compile ${CLAUDE_SKILL_DIR}/examples/m5core2/hello
+arduino-cli upload -p "$port" ${CLAUDE_SKILL_DIR}/examples/m5core2/hello
 ```
 
 With explicit board selection on each command:
 
 ```bash
-arduino-cli compile --fqbn esp32:esp32:m5stack_core2 ./examples/m5core2/hello
-arduino-cli upload -p "$port" --fqbn esp32:esp32:m5stack_core2 ./examples/m5core2/hello
+arduino-cli compile --fqbn esp32:esp32:m5stack_core2 ${CLAUDE_SKILL_DIR}/examples/m5core2/hello
+arduino-cli upload -p "$port" --fqbn esp32:esp32:m5stack_core2 ${CLAUDE_SKILL_DIR}/examples/m5core2/hello
 ```
 
 Helper scripts (auto-detect the port when `--port` is omitted):
 
 ```bash
-./scripts/setup-m5core2.sh --sketch ./examples/m5core2/hello
-./scripts/upload-m5core2.sh --sketch ./examples/m5core2/hello
+${CLAUDE_SKILL_DIR}/scripts/setup-m5core2.sh --sketch ${CLAUDE_SKILL_DIR}/examples/m5core2/hello
+${CLAUDE_SKILL_DIR}/scripts/upload-m5core2.sh --sketch ${CLAUDE_SKILL_DIR}/examples/m5core2/hello
 ```
 
 ### Animation asset conversion (either platform)
+
+> This is a repository-maintenance flow that regenerates the bundled pixel-pet asset and its `docs/public/` previews, so it is meant to run with the current directory at the repository root (where `${CLAUDE_SKILL_DIR}` equals the repo root). The paths below are therefore left relative to that root. When a user instead converts their own animation inside their own project, treat `--input`/`--output`/`--preview`/`--sheet` as their project paths and only `generate_sprite_animation.py` as a `${CLAUDE_SKILL_DIR}` file.
 
 Windows:
 
@@ -139,7 +151,7 @@ Prefer this flow when the user already has rendered or background-removed animat
 
 ## Read references as needed
 
-- Read [references/windows-setup-and-diagnosis.md](./references/windows-setup-and-diagnosis.md) for the Windows and Arduino CLI workflow, command checklist, and explanation of `Unknown`.
-- Read [references/macos-setup-and-diagnosis.md](./references/macos-setup-and-diagnosis.md) for the macOS workflow, `/dev/cu.*` port handling, `esptool` verification, and macOS driver guidance.
-- Read [references/m5-board-notes.md](./references/m5-board-notes.md) when you need board mappings, M5-specific package/library guidance, or a concise explanation of why M5 boards often stay `Unknown` in `board list`.
-- Read [references/development-and-examples.md](./references/development-and-examples.md) when you need setup, flash, and development examples you can adapt quickly.
+- Read [windows-setup-and-diagnosis.md](${CLAUDE_SKILL_DIR}/references/windows-setup-and-diagnosis.md) for the Windows and Arduino CLI workflow, command checklist, and explanation of `Unknown`.
+- Read [macos-setup-and-diagnosis.md](${CLAUDE_SKILL_DIR}/references/macos-setup-and-diagnosis.md) for the macOS workflow, `/dev/cu.*` port handling, `esptool` verification, and macOS driver guidance.
+- Read [m5-board-notes.md](${CLAUDE_SKILL_DIR}/references/m5-board-notes.md) when you need board mappings, M5-specific package/library guidance, or a concise explanation of why M5 boards often stay `Unknown` in `board list`.
+- Read [development-and-examples.md](${CLAUDE_SKILL_DIR}/references/development-and-examples.md) when you need setup, flash, and development examples you can adapt quickly.
