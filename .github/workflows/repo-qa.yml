@@ -52,12 +52,18 @@ jobs:
             'README.ja.md',
             'LICENSE',
             'agents/openai.yaml',
+            'agents/claude.yaml',
             'docs/package.json',
             'docs/.vitepress/config.ts',
             'docs/index.md',
             'docs/ja/index.md',
             'references/windows-setup-and-diagnosis.md',
+            'references/macos-setup-and-diagnosis.md',
             'references/m5-board-notes.md',
+            'scripts/setup-m5core2.ps1',
+            'scripts/setup-m5core2.sh',
+            'scripts/upload-m5core2.ps1',
+            'scripts/upload-m5core2.sh',
             'assets/m5stack-arduino-cli-icon.svg'
           )
 

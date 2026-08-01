@@ -55,22 +55,38 @@ examples/m5core2/pixel_pet/pixel_pet.ino
 
 ### セットアップ補助
 
+Windows:
+
 ```powershell
 .\scripts\setup-m5core2.ps1 -SketchPath .\examples\m5core2\hello -Port COM11
 ```
 
+macOS:
+
+```bash
+./scripts/setup-m5core2.sh --sketch ./examples/m5core2/hello
+```
+
 このスクリプトは次を行います。
 
-- `arduino-cli` を探す
+- `arduino-cli` を探す（PATH、Homebrew、Arduino IDE 同梱版）
 - ESP32 のパッケージ URL を確認する
 - ESP32 コアを導入する
 - `M5GFX` と `M5Unified` を導入する
-- スケッチにボードとポートを `attach` する
+- スケッチにボードとポートを `attach` する（macOS では未指定時に `/dev/cu.*` を自動検出）
 
 ### 書き込み補助
 
+Windows:
+
 ```powershell
 .\scripts\upload-m5core2.ps1 -SketchPath .\examples\m5core2\hello -Port COM11
+```
+
+macOS:
+
+```bash
+./scripts/upload-m5core2.sh --sketch ./examples/m5core2/hello
 ```
 
 SD カード確認用:
@@ -80,11 +96,21 @@ SD カード確認用:
 .\scripts\upload-m5core2.ps1 -SketchPath .\examples\m5core2\sd_text_write -Port COM11
 ```
 
+```bash
+./scripts/setup-m5core2.sh --sketch ./examples/m5core2/sd_text_write
+./scripts/upload-m5core2.sh --sketch ./examples/m5core2/sd_text_write
+```
+
 アニメーション猫サンプル用:
 
 ```powershell
 .\scripts\setup-m5core2.ps1 -SketchPath .\examples\m5core2\pixel_pet -Port COM11
 .\scripts\upload-m5core2.ps1 -SketchPath .\examples\m5core2\pixel_pet -Port COM11
+```
+
+```bash
+./scripts/setup-m5core2.sh --sketch ./examples/m5core2/pixel_pet
+./scripts/upload-m5core2.sh --sketch ./examples/m5core2/pixel_pet
 ```
 
 `uv` でアニメーションヘッダと確認用画像を再生成する例:
@@ -93,11 +119,17 @@ SD カード確認用:
 uv run .\scripts\generate_sprite_animation.py --input 'D:\path\to\cat.webp' --output .\examples\m5core2\pixel_pet\generated_cat_animation.h --preview .\docs\public\examples\pixel_pet\generated_cat_animation_preview.png --sheet .\docs\public\examples\pixel_pet\generated_cat_animation_sheet.png --size 112 --frame-step 4 --sheet-columns 8 --loop-blend-frames 3
 ```
 
+```bash
+uv run ./scripts/generate_sprite_animation.py --input ~/path/to/cat.webp --output ./examples/m5core2/pixel_pet/generated_cat_animation.h --preview ./docs/public/examples/pixel_pet/generated_cat_animation_preview.png --sheet ./docs/public/examples/pixel_pet/generated_cat_animation_sheet.png --size 112 --frame-step 4 --sheet-columns 8 --loop-blend-frames 3
+```
+
 この変換ではフルフレームを使ったまま正方形キャンバスに収め、ループ端に補間フレームを追加しつつ、確認用のプレビュー画像とスプライトシートも同時に出力できます。
 
 このスクリプトはコンパイルとアップロードをまとめて行います。
 
 ## 開発中に `arduino-cli` を直接使う例
+
+Windows:
 
 ```powershell
 $cli = "C:\Users\<User>\AppData\Local\Programs\Arduino IDE\resources\app\lib\backend\resources\arduino-cli.exe"
@@ -106,25 +138,27 @@ $cli = "C:\Users\<User>\AppData\Local\Programs\Arduino IDE\resources\app\lib\bac
 & $cli upload -p COM11 .\examples\m5core2\hello
 ```
 
-SD カード確認用:
+macOS:
 
-```powershell
-& $cli compile .\examples\m5core2\sd_text_write
-& $cli upload -p COM11 .\examples\m5core2\sd_text_write
+```bash
+port=/dev/cu.wchusbserial53240012345
+
+arduino-cli compile ./examples/m5core2/hello
+arduino-cli upload -p "$port" ./examples/m5core2/hello
 ```
 
-アニメーション猫サンプル用:
-
-```powershell
-& $cli compile .\examples\m5core2\pixel_pet
-& $cli upload -p COM11 .\examples\m5core2\pixel_pet
-```
+SD カード確認用は `hello` を `sd_text_write` に、アニメーション猫サンプル用は `pixel_pet` に置き換えます。
 
 まだ `attach` していないなら、毎回 FQBN を明示します。
 
 ```powershell
 & $cli compile --fqbn esp32:esp32:m5stack_core2 .\examples\m5core2\hello
 & $cli upload -p COM11 --fqbn esp32:esp32:m5stack_core2 .\examples\m5core2\hello
+```
+
+```bash
+arduino-cli compile --fqbn esp32:esp32:m5stack_core2 ./examples/m5core2/hello
+arduino-cli upload -p "$port" --fqbn esp32:esp32:m5stack_core2 ./examples/m5core2/hello
 ```
 
 ## 推奨する開発ループ
@@ -137,7 +171,7 @@ SD カード確認用:
 
 ## ユーザーに残すべきもの
 
-Codex が開発支援をするなら、最後に次を残します。
+エージェントが開発支援をするなら、最後に次を残します。
 
 - 動くスケッチのパス
 - `attach` 済みのボード情報
