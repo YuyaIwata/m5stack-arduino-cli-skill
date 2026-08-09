@@ -5,7 +5,7 @@ const repoName = "m5stack-arduino-cli-skill";
 export default defineConfig({
   title: "M5Stack Arduino CLI Skill",
   description:
-    "Codex skill docs for setting up, flashing, and developing with M5Stack boards from Arduino CLI on Windows.",
+    "Claude and Codex skill docs for setting up, flashing, and developing with M5Stack boards from Arduino CLI on Windows and macOS.",
   base: `/${repoName}/`,
   cleanUrls: true,
   lastUpdated: true,
@@ -19,7 +19,7 @@ export default defineConfig({
     socialLinks: [
       {
         icon: "github",
-        link: "https://github.com/Sunwood-ai-labs/m5stack-arduino-cli-skill"
+        link: "https://github.com/YuyaIwata/m5stack-arduino-cli-skill"
       }
     ]
   },
@@ -34,7 +34,7 @@ export default defineConfig({
           { text: "Diagnosis", link: "/guide/diagnosis" },
           { text: "Development", link: "/guide/development" },
           { text: "Structure", link: "/guide/structure" },
-          { text: "GitHub", link: "https://github.com/Sunwood-ai-labs/m5stack-arduino-cli-skill" }
+          { text: "GitHub", link: "https://github.com/YuyaIwata/m5stack-arduino-cli-skill" }
         ],
         sidebar: [
           {
@@ -73,7 +73,7 @@ export default defineConfig({
           { text: "診断", link: "/ja/guide/diagnosis" },
           { text: "開発支援", link: "/ja/guide/development" },
           { text: "構成", link: "/ja/guide/structure" },
-          { text: "GitHub", link: "https://github.com/Sunwood-ai-labs/m5stack-arduino-cli-skill" }
+          { text: "GitHub", link: "https://github.com/YuyaIwata/m5stack-arduino-cli-skill" }
         ],
         sidebar: [
           {

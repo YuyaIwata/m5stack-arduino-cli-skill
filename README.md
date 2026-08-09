@@ -1,9 +1,11 @@
 <div align="center">
   <img src="./assets/m5stack-arduino-cli-icon.svg" alt="M5Stack Arduino CLI icon" width="140" height="140">
   <h1>M5Stack Arduino CLI Skill</h1>
-  <p><strong>A focused Codex skill for setting up, flashing, diagnosing, and supporting M5Stack development with Arduino CLI on Windows.</strong></p>
+  <p><strong>A focused skill for Claude and Codex to set up, flash, diagnose, and support M5Stack development with Arduino CLI on Windows and macOS.</strong></p>
   <p>
     <img src="https://img.shields.io/badge/Platform-Windows_10%2B-0A7E8C?style=flat-square" alt="Windows badge">
+    <img src="https://img.shields.io/badge/Platform-macOS_11%2B-000000?style=flat-square" alt="macOS badge">
+    <img src="https://img.shields.io/badge/Agents-Claude_%26_Codex-6C4AB6?style=flat-square" alt="Claude and Codex badge">
     <img src="https://img.shields.io/badge/Tool-Arduino_CLI-1B5E20?style=flat-square" alt="Arduino CLI badge">
     <img src="https://img.shields.io/badge/Target-M5Stack_%2F_ESP32-37474F?style=flat-square" alt="M5Stack ESP32 badge">
     <img src="https://img.shields.io/badge/License-MIT-E65100?style=flat-square" alt="MIT license badge">
@@ -19,44 +21,98 @@
 
 ## Overview
 
-This repository packages a reusable Codex skill for a stubborn but common workflow: getting an M5Stack board working from `arduino-cli` on Windows when the board shows up as `Unknown`, the serial bridge is generic, or the right ESP32 FQBN is not attached yet.
+This repository packages a reusable skill — usable by both Claude and Codex — for a stubborn but common workflow: getting an M5Stack board working from `arduino-cli` on Windows or macOS when the board shows up as `Unknown`, the serial bridge is generic, or the right ESP32 FQBN is not attached yet.
 
-The skill is optimized for practical troubleshooting and day-to-day development. It prioritizes proving device health, finding the correct COM port, attaching the right board profile, installing common libraries, and getting back to a successful compile or upload without unnecessary driver churn.
+The skill is optimized for practical troubleshooting and day-to-day development. It prioritizes proving device health, finding the correct serial port (`COM*` on Windows, `/dev/cu.*` on macOS), attaching the right board profile, installing common libraries, and getting back to a successful compile or upload without unnecessary driver churn.
+
+## Install As A Claude Code Skill
+
+Claude Code discovers skills under `.claude/skills/`. Place this repository there using the directory name `m5stack-arduino-cli`.
+
+Clone it into your project:
+
+```bash
+git clone https://github.com/YuyaIwata/m5stack-arduino-cli-skill \
+  .claude/skills/m5stack-arduino-cli
+```
+
+Or add it as a submodule so the version is pinned with your project:
+
+```bash
+git submodule add https://github.com/YuyaIwata/m5stack-arduino-cli-skill \
+  .claude/skills/m5stack-arduino-cli
+```
+
+The result should look like:
+
+```text
+your-project/
+└── .claude/
+    └── skills/
+        └── m5stack-arduino-cli/
+            ├── SKILL.md
+            ├── scripts/
+            ├── references/
+            └── examples/
+```
+
+### How paths resolve
+
+Claude Code's working directory is **your project root**, not the skill folder, so the bundled files cannot be reached with a path relative to the current directory. `SKILL.md` refers to its own files as `${CLAUDE_SKILL_DIR}/...` (for example `${CLAUDE_SKILL_DIR}/scripts/setup-m5core2.sh`), where `${CLAUDE_SKILL_DIR}` is the skill's install directory above. Your own files — your sketch folder and any animation assets — stay as ordinary paths in your project.
+
+**Using this repository directly with Codex:** `${CLAUDE_SKILL_DIR}` is a Claude Code convention that Codex does not expand. When you have opened or cloned this repository as the repo itself, read `${CLAUDE_SKILL_DIR}` as the repository root.
 
 ## Why This Skill
 
-- Explains why `arduino-cli board list` can show a valid COM port but still report `Unknown`
-- Covers Windows-specific diagnosis for common USB-serial bridges such as `CH9102` and `CP210x`
-- Guides Codex to use `arduino-cli`, `esptool`, and Windows device information in the right order
+- Explains why `arduino-cli board list` can show a valid serial port but still report `Unknown`
+- Covers Windows and macOS diagnosis for common USB-serial bridges such as `CH9102` and `CP210x`
+- Guides the agent to use `arduino-cli`, `esptool`, and OS device information in the right order
 - Includes board defaults for M5Core2 and common supporting libraries such as `M5GFX` and `M5Unified`
-- Includes sample PowerShell helpers and a starter M5Core2 sketch for setup, upload, and development support
+- Ships both PowerShell (Windows) and bash (macOS/Linux) helpers plus a starter M5Core2 sketch for setup, upload, and development support
 
 ## Quick Start
 
-Ask Codex to use the skill explicitly:
+Ask the agent to use the skill explicitly.
+
+In Claude Code:
+
+```text
+Use the m5stack-arduino-cli skill to set up my M5Core2 on macOS, attach the correct FQBN, and upload a sample sketch from Arduino CLI.
+```
+
+In Codex:
 
 ```text
 Use $m5stack-arduino-cli to set up my M5Core2 on Windows, attach the correct FQBN, and upload a sample sketch from Arduino CLI.
 ```
 
-The skill will steer Codex through this workflow:
+The skill will steer the agent through this workflow:
 
-1. Confirm Windows sees the device as a serial port.
-2. Find `arduino-cli`, including the Arduino IDE bundled binary if needed.
+1. Confirm the OS sees the device as a serial port (`COM*` on Windows, `/dev/cu.*` on macOS).
+2. Find `arduino-cli`, including Homebrew or the Arduino IDE bundled binary if needed.
 3. Ensure `esp32:esp32` board support is installed.
-4. Identify the correct COM port with Windows tools and `arduino-cli board list`.
-5. Treat `Unknown` as an identification gap unless Windows or `esptool` also fails.
+4. Identify the correct port with OS tools and `arduino-cli board list`.
+5. Treat `Unknown` as an identification gap unless the OS or `esptool` also fails.
 6. Install `M5GFX` and `M5Unified` when the sketch needs M5 device helpers.
 7. Attach the right FQBN and port to the sketch before compiling or uploading.
 8. Reuse the bundled scripts and examples for repeatable setup and development.
 
 ## Sample Scripts And Example Sketch
 
-Use the included PowerShell helpers when you want repeatable setup or upload commands:
+Use the included helpers when you want repeatable setup or upload commands.
+
+On Windows (PowerShell):
 
 ```powershell
 .\scripts\setup-m5core2.ps1 -SketchPath .\examples\m5core2\hello -Port COM11
 .\scripts\upload-m5core2.ps1 -SketchPath .\examples\m5core2\hello -Port COM11
+```
+
+On macOS (bash) — the scripts auto-detect a likely `/dev/cu.*` port when `--port` is omitted:
+
+```bash
+./scripts/setup-m5core2.sh --sketch ./examples/m5core2/hello
+./scripts/upload-m5core2.sh --sketch ./examples/m5core2/hello
 ```
 
 Use the bundled starter sketch when you need a first flash check or a clean development base:
@@ -70,6 +126,11 @@ Use the SD card validation sample when you want to confirm that a microSD card c
 ```powershell
 .\scripts\setup-m5core2.ps1 -SketchPath .\examples\m5core2\sd_text_write -Port COM11
 .\scripts\upload-m5core2.ps1 -SketchPath .\examples\m5core2\sd_text_write -Port COM11
+```
+
+```bash
+./scripts/setup-m5core2.sh --sketch ./examples/m5core2/sd_text_write
+./scripts/upload-m5core2.sh --sketch ./examples/m5core2/sd_text_write
 ```
 
 ```text
@@ -88,6 +149,11 @@ Use the pixel pet sample when you want a playful display demo that stays inside 
 ```powershell
 .\scripts\setup-m5core2.ps1 -SketchPath .\examples\m5core2\pixel_pet -Port COM11
 .\scripts\upload-m5core2.ps1 -SketchPath .\examples\m5core2\pixel_pet -Port COM11
+```
+
+```bash
+./scripts/setup-m5core2.sh --sketch ./examples/m5core2/pixel_pet
+./scripts/upload-m5core2.sh --sketch ./examples/m5core2/pixel_pet
 ```
 
 ```text
@@ -126,7 +192,9 @@ That command leaves behind:
 
 ## Direct Arduino CLI Commands
 
-Use these commands when you want to show the exact `arduino-cli` flow instead of the helper scripts:
+Use these commands when you want to show the exact `arduino-cli` flow instead of the helper scripts.
+
+On Windows (PowerShell):
 
 ```powershell
 $cli = "C:\Users\<User>\AppData\Local\Programs\Arduino IDE\resources\app\lib\backend\resources\arduino-cli.exe"
@@ -136,27 +204,36 @@ $cli = "C:\Users\<User>\AppData\Local\Programs\Arduino IDE\resources\app\lib\bac
 & $cli upload -p COM11 .\examples\m5core2\hello
 ```
 
-If you want each command to be explicit and not rely on `sketch.yaml`, use:
+On macOS (bash):
 
-```powershell
-& $cli compile --fqbn esp32:esp32:m5stack_core2 .\examples\m5core2\hello
-& $cli upload -p COM11 --fqbn esp32:esp32:m5stack_core2 .\examples\m5core2\hello
+```bash
+port=/dev/cu.wchusbserial53240012345   # from: arduino-cli board list
+
+arduino-cli board attach -p "$port" -b esp32:esp32:m5stack_core2 ./examples/m5core2/hello
+arduino-cli compile ./examples/m5core2/hello
+arduino-cli upload -p "$port" ./examples/m5core2/hello
 ```
+
+If you want each command to be explicit and not rely on `sketch.yaml`, add `--fqbn esp32:esp32:m5stack_core2` to the `compile` and `upload` calls.
 
 ## Included Files
 
 | Path | Purpose |
 | --- | --- |
-| [`SKILL.md`](./SKILL.md) | Main skill instructions, rules, and default workflow |
-| [`agents/openai.yaml`](./agents/openai.yaml) | Agent-facing metadata such as display name and default prompt |
-| [`scripts/setup-m5core2.ps1`](./scripts/setup-m5core2.ps1) | PowerShell helper for CLI discovery, ESP32 setup, library install, and board attach |
-| [`scripts/upload-m5core2.ps1`](./scripts/upload-m5core2.ps1) | PowerShell helper for compile and upload |
+| [`SKILL.md`](./SKILL.md) | Main skill instructions, rules, and default workflow (read directly by Claude Code) |
+| [`agents/openai.yaml`](./agents/openai.yaml) | Codex-facing metadata such as display name and default prompt |
+| [`agents/claude.yaml`](./agents/claude.yaml) | Claude-facing interface metadata (parity with `openai.yaml`) |
+| [`scripts/setup-m5core2.ps1`](./scripts/setup-m5core2.ps1) | Windows PowerShell helper for CLI discovery, ESP32 setup, library install, and board attach |
+| [`scripts/upload-m5core2.ps1`](./scripts/upload-m5core2.ps1) | Windows PowerShell helper for compile and upload |
+| [`scripts/setup-m5core2.sh`](./scripts/setup-m5core2.sh) | macOS/Linux bash helper for CLI discovery, ESP32 setup, library install, and board attach |
+| [`scripts/upload-m5core2.sh`](./scripts/upload-m5core2.sh) | macOS/Linux bash helper for compile and upload |
 | [`scripts/generate_sprite_animation.py`](./scripts/generate_sprite_animation.py) | `uv`-driven converter from transparent animated WebP to RGB565 animation frames plus optional preview artifacts |
 | [`examples/m5core2/hello/hello.ino`](./examples/m5core2/hello/hello.ino) | Sample M5Core2 sketch for first flash and development |
 | [`examples/m5core2/sd_text_write/sd_text_write.ino`](./examples/m5core2/sd_text_write/sd_text_write.ino) | Sample M5Core2 sketch for SD card text write, readback, and free-space checks |
 | [`examples/m5core2/pixel_pet/pixel_pet.ino`](./examples/m5core2/pixel_pet/pixel_pet.ino) | Sample M5Core2 sketch for transparent WebP-driven cat animation and button-driven reactions |
 | [`docs/`](./docs/) | Bilingual VitePress docs for browsing the workflow as a site |
 | [`references/windows-setup-and-diagnosis.md`](./references/windows-setup-and-diagnosis.md) | Windows commands, setup flow, and `Unknown` troubleshooting |
+| [`references/macos-setup-and-diagnosis.md`](./references/macos-setup-and-diagnosis.md) | macOS commands, `/dev/cu.*` port handling, `esptool` checks, and driver guidance |
 | [`references/m5-board-notes.md`](./references/m5-board-notes.md) | M5-specific board notes, bridge-chip context, and FQBN defaults |
 | [`references/development-and-examples.md`](./references/development-and-examples.md) | Development workflow, sample commands, and example usage |
 
@@ -169,13 +246,13 @@ The skill distinguishes between:
 - port detection
 - board identification
 
-That difference matters because many healthy M5Stack boards expose only a generic USB-serial bridge to Windows. In that situation, a COM port can be completely valid while Arduino CLI still cannot infer the exact board model automatically.
+That difference matters because many healthy M5Stack boards expose only a generic USB-serial bridge to the OS. In that situation, a `COM*` or `/dev/cu.*` port can be completely valid while Arduino CLI still cannot infer the exact board model automatically.
 
 ### Prefer proof over guesswork
 
-The guidance intentionally avoids random driver reinstalls. It asks Codex to confirm:
+The guidance intentionally avoids random driver reinstalls. It asks the agent to confirm:
 
-- Windows device status
+- OS device status
 - serial port visibility
 - ESP32 package installation
 - `esptool` reachability when needed
@@ -183,7 +260,7 @@ The guidance intentionally avoids random driver reinstalls. It asks Codex to con
 
 ### Support real development work
 
-The repository is not limited to one-time setup. It also helps Codex:
+The repository is not limited to one-time setup. It also helps the agent:
 
 - bootstrap a new M5Core2 sketch
 - install the common M5 libraries
@@ -196,10 +273,10 @@ The repository is not limited to one-time setup. It also helps Codex:
 The repository now uses a growth-friendly structure:
 
 - board samples live under `examples/<board>/<sample>/`
-- shared PowerShell logic lives under `scripts/common/`
+- shared PowerShell and bash logic lives under `scripts/common/`
 - board setup flows live under `scripts/setup/`
 - generic upload flows live under `scripts/upload/`
-- user-facing wrapper commands stay short at the top level
+- user-facing wrapper commands stay short at the top level, with `.ps1` (Windows) and `.sh` (macOS/Linux) side by side
 
 ## Repository Layout
 
@@ -209,6 +286,7 @@ The repository now uses a growth-friendly structure:
 |-- README.md
 |-- README.ja.md
 |-- agents/
+|   |-- claude.yaml
 |   `-- openai.yaml
 |-- assets/
 |   `-- m5stack-arduino-cli-icon.svg
@@ -223,21 +301,26 @@ The repository now uses a growth-friendly structure:
 |       `-- sd_text_write/
 |-- scripts/
 |   |-- common/
+|   |   |-- arduino-cli-common.ps1
+|   |   `-- arduino-cli-common.sh
 |   |-- setup/
 |   |-- upload/
 |   |-- setup-m5core2.ps1
-|   `-- upload-m5core2.ps1
+|   |-- setup-m5core2.sh
+|   |-- upload-m5core2.ps1
+|   `-- upload-m5core2.sh
 `-- references/
     |-- development-and-examples.md
     |-- m5-board-notes.md
+    |-- macos-setup-and-diagnosis.md
     `-- windows-setup-and-diagnosis.md
 ```
 
 ## When To Reach For It
 
-Use this repository when you want a repeatable, repo-local skill that helps Codex:
+Use this repository when you want a repeatable, repo-local skill that helps Claude or Codex:
 
-- set up an M5Stack board on Windows
+- set up an M5Stack board on Windows or macOS
 - explain why `arduino-cli board list` says `Unknown`
 - attach `esp32:esp32:m5stack_core2` or another intended FQBN
 - install the libraries an M5 sketch usually needs

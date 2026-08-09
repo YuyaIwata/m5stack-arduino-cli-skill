@@ -2,7 +2,9 @@
 
 ## Purpose
 
-Use this reference when you need to go beyond a one-off diagnosis and support a repeatable development workflow for M5Stack boards on Windows.
+Use this reference when you need to go beyond a one-off diagnosis and support a repeatable development workflow for M5Stack boards on Windows or macOS.
+
+The examples below show Windows (PowerShell) and macOS (bash) side by side. On macOS the helper scripts auto-detect a likely `/dev/cu.*` port when `--port` is omitted; pass `--port /dev/cu.wchusbserial...` to pin one, and `--dry-run` to preview commands.
 
 ## Default development flow
 
@@ -15,8 +17,16 @@ Use this reference when you need to go beyond a one-off diagnosis and support a 
 
 ## Sample setup command
 
+Windows:
+
 ```powershell
 .\scripts\setup-m5core2.ps1 -SketchPath .\examples\m5core2\hello -Port COM11
+```
+
+macOS:
+
+```bash
+./scripts/setup-m5core2.sh --sketch ./examples/m5core2/hello
 ```
 
 For SD card validation with file write and remaining-capacity checks:
@@ -25,16 +35,32 @@ For SD card validation with file write and remaining-capacity checks:
 .\scripts\setup-m5core2.ps1 -SketchPath .\examples\m5core2\sd_text_write -Port COM11
 ```
 
+```bash
+./scripts/setup-m5core2.sh --sketch ./examples/m5core2/sd_text_write
+```
+
 For a button-reactive cat animation that replays imported frames from an animated WebP:
 
 ```powershell
 .\scripts\setup-m5core2.ps1 -SketchPath .\examples\m5core2\pixel_pet -Port COM11
 ```
 
+```bash
+./scripts/setup-m5core2.sh --sketch ./examples/m5core2/pixel_pet
+```
+
 ## Sample upload command
+
+Windows:
 
 ```powershell
 .\scripts\upload-m5core2.ps1 -SketchPath .\examples\m5core2\hello -Port COM11
+```
+
+macOS:
+
+```bash
+./scripts/upload-m5core2.sh --sketch ./examples/m5core2/hello
 ```
 
 For the SD card sample:
@@ -43,10 +69,18 @@ For the SD card sample:
 .\scripts\upload-m5core2.ps1 -SketchPath .\examples\m5core2\sd_text_write -Port COM11
 ```
 
+```bash
+./scripts/upload-m5core2.sh --sketch ./examples/m5core2/sd_text_write
+```
+
 For the pixel pet sample:
 
 ```powershell
 .\scripts\upload-m5core2.ps1 -SketchPath .\examples\m5core2\pixel_pet -Port COM11
+```
+
+```bash
+./scripts/upload-m5core2.sh --sketch ./examples/m5core2/pixel_pet
 ```
 
 ## What the sample sketches demonstrate
@@ -78,6 +112,12 @@ To regenerate the transparent cat animation asset with `uv` and Pillow:
 
 ```powershell
 uv run .\scripts\generate_sprite_animation.py --input 'D:\path\to\cat.webp' --output .\examples\m5core2\pixel_pet\generated_cat_animation.h --preview .\docs\public\examples\pixel_pet\generated_cat_animation_preview.png --sheet .\docs\public\examples\pixel_pet\generated_cat_animation_sheet.png --size 112 --frame-step 4 --sheet-columns 8 --loop-blend-frames 3
+```
+
+The same converter runs on macOS with POSIX paths:
+
+```bash
+uv run ./scripts/generate_sprite_animation.py --input ~/path/to/cat.webp --output ./examples/m5core2/pixel_pet/generated_cat_animation.h --preview ./docs/public/examples/pixel_pet/generated_cat_animation_preview.png --sheet ./docs/public/examples/pixel_pet/generated_cat_animation_sheet.png --size 112 --frame-step 4 --sheet-columns 8 --loop-blend-frames 3
 ```
 
 That conversion flow leaves behind:

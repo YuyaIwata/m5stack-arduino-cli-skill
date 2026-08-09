@@ -3,8 +3,8 @@ layout: home
 
 hero:
   name: "M5Stack Arduino CLI Skill"
-  text: "Set up, flash, and develop with M5Stack on Windows without guesswork"
-  tagline: "A bilingual documentation hub for the Codex skill that turns `Unknown` board reports into a repeatable setup, upload, and development workflow."
+  text: "Set up, flash, and develop with M5Stack on Windows and macOS without guesswork"
+  tagline: "A bilingual documentation hub for the Claude and Codex skill that turns `Unknown` board reports into a repeatable setup, upload, and development workflow."
   image:
     src: /icon.svg
     alt: M5Stack Arduino CLI Skill icon
@@ -24,9 +24,9 @@ hero:
 
 features:
   - title: "Treat `Unknown` correctly"
-    details: "Separate COM port discovery from board identification so healthy boards are not mistaken for driver failures."
-  - title: "Stay Windows-aware"
-    details: "Use `Get-PnpDevice`, `arduino-cli`, and `esptool` in the right order for CH9102 and CP210x based M5Stack devices."
+    details: "Separate serial port discovery from board identification so healthy boards are not mistaken for driver failures."
+  - title: "Windows and macOS aware"
+    details: "Use `Get-PnpDevice` / `system_profiler`, `arduino-cli`, and `esptool` in the right order for CH9102 and CP210x based M5Stack devices, with PowerShell and bash helpers."
   - title: "Support setup through development"
     details: "Move from first attach and upload to repeatable CLI-based development with helper scripts and sample sketches."
 ---
