@@ -32,14 +32,14 @@ Claude Code discovers skills under `.claude/skills/`. Place this repository ther
 Clone it into your project:
 
 ```bash
-git clone https://github.com/Sunwood-ai-labs/m5stack-arduino-cli-skill \
+git clone https://github.com/YuyaIwata/m5stack-arduino-cli-skill \
   .claude/skills/m5stack-arduino-cli
 ```
 
 Or add it as a submodule so the version is pinned with your project:
 
 ```bash
-git submodule add https://github.com/Sunwood-ai-labs/m5stack-arduino-cli-skill \
+git submodule add https://github.com/YuyaIwata/m5stack-arduino-cli-skill \
   .claude/skills/m5stack-arduino-cli
 ```
 

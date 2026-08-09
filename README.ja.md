@@ -37,14 +37,14 @@ Claude Code は `.claude/skills/` 配下のスキルを認識します。この�
 プロジェクトに clone する場合:
 
 ```bash
-git clone https://github.com/Sunwood-ai-labs/m5stack-arduino-cli-skill \
+git clone https://github.com/YuyaIwata/m5stack-arduino-cli-skill \
   .claude/skills/m5stack-arduino-cli
 ```
 
 バージョンをプロジェクトに固定したい場合は submodule として追加します:
 
 ```bash
-git submodule add https://github.com/Sunwood-ai-labs/m5stack-arduino-cli-skill \
+git submodule add https://github.com/YuyaIwata/m5stack-arduino-cli-skill \
   .claude/skills/m5stack-arduino-cli
 ```
 
